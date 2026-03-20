@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "sport": "euroleague",
+      "league": "EuroLeague",
+      "home_team": "Real Madrid",
+      "away_team": "Anadolu Efes",
+      "match_date": "2026-03-20T19:45:00Z",
+      "home_score": 86,
+      "away_score": 79,
+      "winner": "home",
+      "notes": "Example manual EuroLeague settlement row"
+    }
+  ]
+}

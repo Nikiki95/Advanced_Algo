@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "sport": "football",
+      "home_team": "Bayern Munich",
+      "away_team": "Borussia Dortmund",
+      "match_date": "2026-03-21T17:30:00Z",
+      "player_name": "Harry Kane",
+      "market": "player_shots_on_target",
+      "stat_value": 2,
+      "notes": "Example manual settlement row"
+    }
+  ]
+}

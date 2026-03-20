@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "sport": "nfl",
+      "home_team": "Kansas City Chiefs",
+      "away_team": "Buffalo Bills",
+      "match_date": "2026-01-19T23:30:00Z",
+      "player_name": "Patrick Mahomes",
+      "market": "player_pass_yds",
+      "stat_value": 287,
+      "notes": "Example manual settlement row"
+    }
+  ]
+}

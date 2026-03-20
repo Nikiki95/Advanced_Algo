@@ -1,0 +1,3 @@
+# NFL-specific + shared
+-r ../shared/requirements.txt
+beautifulsoup4>=4.12

@@ -1,0 +1,14 @@
+{
+  "rows": [
+    {
+      "sport": "nba",
+      "home_team": "Boston Celtics",
+      "away_team": "Milwaukee Bucks",
+      "match_date": "2026-03-20T00:30:00Z",
+      "player_name": "Jayson Tatum",
+      "market": "player_points",
+      "stat_value": 31,
+      "notes": "Example manual settlement row"
+    }
+  ]
+}

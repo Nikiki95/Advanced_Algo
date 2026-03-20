@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "sport": "nba",
+      "league": "NBA",
+      "home_team": "Boston Celtics",
+      "away_team": "Milwaukee Bucks",
+      "match_date": "2026-03-20T00:30:00Z",
+      "home_score": 118,
+      "away_score": 111,
+      "winner": "home",
+      "notes": "Example manual NBA settlement row"
+    }
+  ]
+}

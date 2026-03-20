@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "sport": "nfl",
+      "league": "NFL",
+      "home_team": "Kansas City Chiefs",
+      "away_team": "Buffalo Bills",
+      "match_date": "2026-01-19T23:30:00Z",
+      "home_score": 27,
+      "away_score": 24,
+      "winner": "home",
+      "notes": "Example manual NFL settlement row"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "rows": [
+    {
+      "sport": "tennis",
+      "league": "tennis_atp_miami_open",
+      "home_team": "Carlos Alcaraz",
+      "away_team": "Jannik Sinner",
+      "match_date": "2026-03-20T18:00:00Z",
+      "winner": "home",
+      "notes": "Example manual tennis settlement row"
+    }
+  ]
+}
