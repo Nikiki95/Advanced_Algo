@@ -57,15 +57,19 @@ class NFLLoader:
         return pd.DataFrame(games)
     
     def _mock_games(self, weeks: int) -> pd.DataFrame:
-        """Mock vergangene Spiele."""
-        teams = ["KC", "SF", "BAL", "DET", "BUF", "PHI", "DAL", "MIA",
-                 "CIN", "CLE", "PIT", "GB", "MIN", "LAR", "SEA", "TB"]
+        """Mock vergangene Spiele - ALLE 32 NFL TEAMS."""
+        teams = [
+            "KC", "SF", "BAL", "DET", "BUF", "PHI", "DAL", "MIA",
+            "CIN", "CLE", "PIT", "GB", "MIN", "LAR", "SEA", "TB",
+            "NO", "ATL", "CAR", "IND", "TEN", "JAX", "HOU", "DEN",
+            "LAC", "LV", "NYJ", "NYG", "WAS", "CHI", "ARI", "NE"
+        ]
         
         games = []
         for week in range(weeks):
-            for i in range(8):
-                home = teams[i % 16]
-                away = teams[(i + 4) % 16]
+            for i in range(16):  # 16 Spiele pro Woche = alle 32 Teams
+                home = teams[i % 32]
+                away = teams[(i + 16) % 32]  # Gegner aus anderer Hälfte
                 h_score = 20 + (i * 3 % 25)
                 a_score = 17 + (i * 7 % 22)
                 games.append({

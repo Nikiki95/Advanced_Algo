@@ -39,10 +39,38 @@ class NBAOddsScraper:
         self.base_url = THEODDS_BASE_URL
 
     def _normalize_team(self, name: str) -> str:
+        """Map full team names to model short names."""
         mapping = {
             'Los Angeles Lakers': 'LAL',
             'Golden State Warriors': 'Golden State',
             'LA Clippers': 'LA Clippers',
+            'Atlanta Hawks': 'Atlanta',
+            'Boston Celtics': 'Boston',
+            'Brooklyn Nets': 'Brooklyn',
+            'Charlotte Hornets': 'Charlotte',
+            'Chicago Bulls': 'Chicago',
+            'Cleveland Cavaliers': 'Cleveland',
+            'Dallas Mavericks': 'Dallas',
+            'Denver Nuggets': 'Denver',
+            'Detroit Pistons': 'Detroit',
+            'Houston Rockets': 'Houston',
+            'Indiana Pacers': 'Indiana',
+            'Memphis Grizzlies': 'Memphis',
+            'Miami Heat': 'Miami',
+            'Milwaukee Bucks': 'Milwaukee',
+            'Minnesota Timberwolves': 'Minnesota',
+            'New Orleans Pelicans': 'New Orleans',
+            'New York Knicks': 'New York',
+            'Oklahoma City Thunder': 'Oklahoma City',
+            'Orlando Magic': 'Orlando',
+            'Philadelphia 76ers': 'Philadelphia',
+            'Phoenix Suns': 'Phoenix',
+            'Portland Trail Blazers': 'Portland',
+            'Sacramento Kings': 'Sacramento',
+            'San Antonio Spurs': 'San Antonio',
+            'Toronto Raptors': 'Toronto',
+            'Utah Jazz': 'Utah',
+            'Washington Wizards': 'Washington',
         }
         return mapping.get(name, name)
 

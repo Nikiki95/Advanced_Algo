@@ -13,7 +13,7 @@ from nfl_analyzer import train_model
 
 
 def main():
-    model = train_model(weeks_back=17)
+    model = train_model(weeks_back=52)  # 52 Wochen = alle 32 Teams
     if model is None:
         raise SystemExit(1)
 
