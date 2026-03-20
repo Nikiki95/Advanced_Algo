@@ -1,0 +1,66 @@
+# Secrets
+secrets/.env
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# Runtime data (keep folder structure, ignore generated contents)
+**/data/*
+!**/data/.gitkeep
+**/models/*
+!**/models/.gitkeep
+**/logs/*
+!**/logs/.gitkeep
+**/tracked_bets/*
+!**/tracked_bets/.gitkeep
+shared/output/*
+!shared/output/.gitkeep
+
+# Serialized / generated artifacts
+*.pkl
+*.pickle
+*.sqlite
+*.db
+*.csv
+*.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+playwright/.cache/
+
+# New module runtime
+euroleague/data/*
+!euroleague/data/.gitkeep
+euroleague/models/*
+!euroleague/models/.gitkeep
+!euroleague/models/player_ratings.sample.json
+euroleague/logs/*
+!euroleague/logs/.gitkeep
+tennis/data/*
+!tennis/data/.gitkeep
+tennis/models/*
+!tennis/models/.gitkeep
+!tennis/models/player_ratings.sample.json
+tennis/logs/*
+!tennis/logs/.gitkeep
