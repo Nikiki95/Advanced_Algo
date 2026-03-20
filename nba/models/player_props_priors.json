@@ -1,0 +1,46 @@
+{
+  "players": {
+    "LeBron James": {
+      "player_points": {
+        "mean": 25.5,
+        "std": 6.4
+      },
+      "player_rebounds": {
+        "mean": 7.2,
+        "std": 2.8
+      },
+      "player_assists": {
+        "mean": 8.0,
+        "std": 2.7
+      }
+    },
+    "Luka Doncic": {
+      "player_points": {
+        "mean": 31.2,
+        "std": 7.0
+      },
+      "player_rebounds": {
+        "mean": 8.9,
+        "std": 3.1
+      },
+      "player_assists": {
+        "mean": 9.1,
+        "std": 2.9
+      }
+    },
+    "Jayson Tatum": {
+      "player_points": {
+        "mean": 27.4,
+        "std": 6.1
+      },
+      "player_rebounds": {
+        "mean": 8.3,
+        "std": 2.6
+      },
+      "player_assists": {
+        "mean": 4.9,
+        "std": 1.9
+      }
+    }
+  }
+}

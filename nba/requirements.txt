@@ -1,0 +1,5 @@
+# NBA-specific + shared
+-r ../shared/requirements.txt
+beautifulsoup4>=4.12
+# Optional: nba_api for load management tracking
+# nba_api>=1.4

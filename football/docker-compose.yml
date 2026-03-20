@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  betting-algo:
+    build: .
+    container_name: value-bet-algo
+    
+    # Security
+    user: "1000:1000"
+    read_only: true
+    
+    # Nur notwendige Capabilities
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    
+    # Network isolieren
+    networks:
+      - betting-net
+    
+    # Volumes (nur hier writebar)
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./.env:/app/.env:ro  # Read-only Secrets
+    
+    # Environment
+    env_file:
+      - .env
+    
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Restart Policy
+    restart: unless-stopped
+    
+    # Kein stdin/tty für Production
+    stdin_open: false
+    tty: false
+
+  # Optional: Cron-Service für regelmäßige Checks
+  betting-cron:
+    build: .
+    container_name: value-bet-cron
+    user: "1000:1000"
+    read_only: true
+    
+    # Cron-Schedule alle 30 Min
+    command: >
+      sh -c "while true; do
+        python main.py --no-notify 2>&1 | tee -a /app/data/cron.log;
+        sleep 1800;
+      done"
+    
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./.env:/app/.env:ro
+    
+    networks:
+      - betting-net
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    
+    restart: unless-stopped
+    profiles:
+      - cron  # Nur mit docker-compose --profile cron up
+
+networks:
+  betting-net:
+    driver: bridge
+    internal: false  # Internet-Zugriff für Scraping

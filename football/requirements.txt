@@ -1,0 +1,5 @@
+# Football-specific + shared
+-r ../shared/requirements.txt
+penaltyblog>=0.4.0
+beautifulsoup4>=4.12
+playwright>=1.40
