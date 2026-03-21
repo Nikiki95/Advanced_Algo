@@ -44,6 +44,7 @@ class NBAOddsScraper:
             'Los Angeles Lakers': 'LAL',
             'Golden State Warriors': 'Golden State',
             'LA Clippers': 'LA Clippers',
+            'LAC': 'LA Clippers',  # FIX: Merge LAC into LA Clippers
             'Atlanta Hawks': 'Atlanta',
             'Boston Celtics': 'Boston',
             'Brooklyn Nets': 'Brooklyn',
