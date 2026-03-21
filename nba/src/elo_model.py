@@ -133,10 +133,10 @@ class NBAEloModel:
             self.team_ortg[team] = (1 - alpha) * old_ortg + alpha * (scored / est_pace * 100 if est_pace > 0 else old_ortg)
             self.team_drtg[team] = (1 - alpha) * old_drtg + alpha * (allowed / est_pace * 100 if est_pace > 0 else old_drtg)
 
-    def train(self, games: pd.DataFrame, max_games: int = 150) -> "NBAEloModel":
+    def train(self, games: pd.DataFrame, max_games: int = 20) -> "NBAEloModel":
         """
         Train on historical games.
-        FIXED: Default 150 games (roughly a full season), was 30.
+        SHORT MEMORY: Default 20 games (last ~3-4 weeks), heavily weighted.
         Set max_games=0 for all games.
         """
         games = games.sort_values("date", ascending=False).reset_index(drop=True)

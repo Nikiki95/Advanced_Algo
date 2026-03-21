@@ -71,38 +71,42 @@ def combine_seasons():
     return all_games, total_played
 
 def train_model(games):
-    """Train ELO model on combined data"""
-    print("\n🎓 Training ELO model on combined data...")
+    """Train ELO model on SHORT MEMORY (last 20 games)"""
+    print("\n🎓 Training ELO model on SHORT MEMORY (last 20 games)...")
     
-    # Short memory: weight recent games more
+    # Short memory model: Only last 20 games, high K-factor for quick adaptation
     model = NBAEloModel(
         initial_elo=1500,
-        k_factor=20,  # Standard K-factor
+        k_factor=40,  # DOUBLED K-factor for faster updates
         home_advantage=100,
-        margin_mult=1.0
+        margin_mult=1.2  # Higher margin weight for recent form
     )
     
-    # Sort by date (chronological)
+    # Sort by date (chronological) and take LAST 20 games only
     games_sorted = sorted(games, key=lambda x: x.get('DateUtc', ''))
-    
-    # Train on all games with scores
-    trained = 0
-    current_season_trained = 0
+    games_with_scores = []
     
     for game in games_sorted:
+        home_score = game.get('HomeTeamScore')
+        away_score = game.get('AwayTeamScore')
+        
+        if home_score is not None and away_score is not None:
+            if home_score > 0 or away_score > 0:
+                games_with_scores.append(game)
+    
+    # SHORT MEMORY: Only last 20 games
+    recent_games = games_with_scores[-20:] if len(games_with_scores) > 20 else games_with_scores
+    
+    print(f"📊 Using last {len(recent_games)} games (SHORT MEMORY mode)")
+    
+    trained = 0
+    for game in recent_games:
         home_team = game.get('HomeTeam')
         away_team = game.get('AwayTeam')
         home_score = game.get('HomeTeamScore')
         away_score = game.get('AwayTeamScore')
         date = game.get('DateUtc', '')[:10]
-        season = game.get('_season', 'unknown')
         
-        # Skip games without scores
-        if home_score is None or away_score is None:
-            continue
-        if home_score == 0 and away_score == 0:
-            continue
-            
         # Normalize team names
         home = TEAM_ABBREVS.get(home_team, home_team)
         away = TEAM_ABBREVS.get(away_team, away_team)
@@ -111,15 +115,11 @@ def train_model(games):
             # Update model
             model.update_game(home, away, home_score, away_score, date)
             trained += 1
-            
-            if season == "2025/2026":
-                current_season_trained += 1
                 
         except Exception as e:
             print(f"⚠️ Error on {home} vs {away}: {e}")
     
-    print(f"✅ Trained on {trained} total games")
-    print(f"   - {current_season_trained} games from current 2025/26 season")
+    print(f"✅ Trained on {trained} games (SHORT MEMORY: last 20)")
     
     return model
 
