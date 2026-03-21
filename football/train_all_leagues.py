@@ -24,6 +24,7 @@ LEAGUE_CONFIG = {
     
     # England  
     'E0': {'name': 'Premier League', 'country': 'England', 'seasons': 3},
+    'E1': {'name': 'Championship', 'country': 'England', 'seasons': 3},
     
     # Spanien
     'SP1': {'name': 'La Liga', 'country': 'Spain', 'seasons': 3},

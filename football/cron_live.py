@@ -31,8 +31,9 @@ load_env()
 
 LEAGUE_KEY_MAP = {
     "D1": "soccer_germany_bundesliga",
-    "D2": "soccer_germany_bundesliga_2",
+    "D2": "soccer_germany_bundesliga2",  # Korrekter Key
     "E0": "soccer_epl",
+    "E1": "soccer_efl_champ",  # Championship (korrekter Key)
     "SP1": "soccer_spain_la_liga",
     "I1": "soccer_italy_serie_a",
     "F1": "soccer_france_ligue_one",
@@ -202,7 +203,7 @@ def main():
     parser.add_argument(
         "--leagues",
         nargs="+",
-        default=["D1"],
+        default=SUPPORTED_LEAGUES,  # Alle Ligen default
         help=f"League codes to check. Supported: {' '.join(SUPPORTED_LEAGUES)}",
     )
     parser.add_argument("--shadow", action="store_true")
