@@ -104,11 +104,160 @@ class LiveCronRunner:
             rows,
         )
 
+    def _normalize_team_name(self, name: str, league_code: str = "") -> str:
+        """Map API team names to model team names."""
+        # Common normalizations
+        name = name.strip()
+        
+        # Bundesliga (D1, D2)
+        bundesliga_map = {
+            "FSV Mainz 05": "Mainz",
+            "1. FSV Mainz 05": "Mainz",
+            "Eintracht Frankfurt": "Ein Frankfurt",
+            "Eintracht Frankfurt ": "Frankfurt",
+            "Borussia Dortmund": "Dortmund",
+            "Borussia Mönchengladbach": "Mgladbach",
+            "Borussia Monchengladbach": "Mgladbach",
+            "VfB Stuttgart": "Stuttgart",
+            "VfL Wolfsburg": "Wolfsburg",
+            "TSG 1899 Hoffenheim": "Hoffenheim",
+            "TSG Hoffenheim": "Hoffenheim",
+            "SC Freiburg": "Freiburg",
+            "Sport-Club Freiburg": "Freiburg",
+            "FC Augsburg": "Augsburg",
+            "Hertha BSC": "Hertha",
+            "Hertha Berlin": "Hertha",
+            "1. FC Köln": "Koln",
+            "1. FC Union Berlin": "Union Berlin",
+            "Werder Bremen": "Werder",
+            "SV Werder Bremen": "Werder",
+            "FC St. Pauli": "St. Pauli",
+            "Holstein Kiel": "Kiel",
+            "VfL Bochum": "Bochum",
+            "FC Heidenheim": "Heidenheim",
+            "1. FC Heidenheim": "Heidenheim",
+        }
+        
+        # Premier League (E0)
+        epl_map = {
+            "Manchester City": "Man City",
+            "Manchester United": "Man United",
+            "Newcastle United": "Newcastle",
+            "Tottenham Hotspur": "Tottenham",
+            "West Ham United": "West Ham",
+            "Brighton and Hove Albion": "Brighton",
+            "Wolverhampton Wanderers": "Wolves",
+            "Nottingham Forest": "Nott'm Forest",
+            "Leicester City": "Leicester",
+            "Ipswich Town": "Ipswich",
+            "Southampton": "Southampton",
+        }
+        
+        # La Liga (SP1)
+        laliga_map = {
+            "Atlético Madrid": "Ath Madrid",
+            "Athletic Club": "Ath Bilbao",
+            "Real Betis": "Betis",
+            "Celta de Vigo": "Celta",
+            "RC Celta de Vigo": "Celta",
+            "Deportivo Alavés": "Alaves",
+            "Girona FC": "Girona",
+            "Rayo Vallecano": "Vallecano",
+            "Real Sociedad": "Sociedad",
+            "UD Las Palmas": "Las Palmas",
+            "RCD Mallorca": "Mallorca",
+            "CD Leganés": "Leganes",
+            "Real Valladolid": "Valladolid",
+            "RCD Espanyol": "Espanyol",
+        }
+        
+        # Serie A (I1)
+        seriea_map = {
+            "Inter Milan": "Inter",
+            "FC Internazionale Milano": "Inter",
+            "AC Milan": "Milan",
+            "AS Roma": "Roma",
+            "SS Lazio": "Lazio",
+            "SSC Napoli": "Napoli",
+            "Juventus FC": "Juventus",
+            "Atalanta BC": "Atalanta",
+            "Bologna FC 1909": "Bologna",
+            "ACF Fiorentina": "Fiorentina",
+            "Torino FC": "Torino",
+            "Udinese Calcio": "Udinese",
+            "US Lecce": "Lecce",
+            "AC Monza": "Monza",
+            "Genoa CFC": "Genoa",
+            "Cagliari Calcio": "Cagliari",
+            "Hellas Verona FC": "Verona",
+            "Empoli FC": "Empoli",
+            "Como 1907": "Como",
+            "Venezia FC": "Venezia",
+            "Parma Calcio 1913": "Parma",
+        }
+        
+        # Ligue 1 (F1)
+        ligue1_map = {
+            "Paris Saint-Germain": "Paris SG",
+            "Paris Saint-Germain FC": "Paris SG",
+            "AS Monaco": "Monaco",
+            "Olympique de Marseille": "Marseille",
+            "Olympique Lyonnais": "Lyon",
+            "LOSC Lille": "Lille",
+            "Stade Rennais FC": "Rennes",
+            "OGC Nice": "Nice",
+            "RC Lens": "Lens",
+            "RC Strasbourg Alsace": "Strasbourg",
+            "Montpellier HSC": "Montpellier",
+            "FC Nantes": "Nantes",
+            "Stade de Reims": "Reims",
+            "Stade Brestois 29": "Brest",
+            "Toulouse FC": "Toulouse",
+            "AJ Auxerre": "Auxerre",
+            "Havre AC": "Le Havre",
+            "Angers SCO": "Angers",
+            "AS Saint-Étienne": "St Etienne",
+        }
+        
+        # Combine all maps
+        all_maps = {**bundesliga_map, **epl_map, **laliga_map, **seriea_map, **ligue1_map}
+        
+        return all_maps.get(name, name)
+
+    def _find_team_in_model(self, name: str) -> str:
+        """Find team name in model, trying normalized versions."""
+        if not self.model:
+            return name
+            
+        # Direct match
+        if name in self.model.team_ratings:
+            return name
+            
+        # Try normalized
+        normalized = self._normalize_team_name(name)
+        if normalized in self.model.team_ratings:
+            return normalized
+            
+        # Try partial match
+        for model_team in self.model.team_ratings.keys():
+            if model_team.lower() in name.lower() or name.lower() in model_team.lower():
+                return model_team
+                
+        return normalized  # Return normalized even if not found (will fail gracefully)
+
     def _analyze_match(self, odds_match) -> List[ValueBet]:
-        pred = self.model.predict(odds_match.home_team, odds_match.away_team)
+        # Map team names to model names
+        home_mapped = self._find_team_in_model(odds_match.home_team)
+        away_mapped = self._find_team_in_model(odds_match.away_team)
+        
+        # Check if teams exist in model
+        if home_mapped not in self.model.team_ratings or away_mapped not in self.model.team_ratings:
+            return []
+            
+        pred = self.model.predict(home_mapped, away_mapped)
         if not pred:
             return []
-        pred.home_team = odds_match.home_team
+        pred.home_team = odds_match.home_team  # Keep original names for output
         pred.away_team = odds_match.away_team
         pred.league = getattr(odds_match, "league", "")
         hist_perf = self.tracker.calculate_performance(days=90, sport="football", execution_mode=self.execution_mode)

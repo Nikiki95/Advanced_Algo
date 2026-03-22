@@ -18,7 +18,7 @@ except ImportError:
     cfg = None
 
 # Defaults when config not available
-_MIN_VALUE = getattr(cfg, 'MIN_VALUE_THRESHOLD', 0.05) if cfg else 0.05
+_MIN_VALUE = getattr(cfg, 'MIN_VALUE_THRESHOLD', 0.02) if cfg else 0.02
 _KELLY_FRAC = getattr(cfg, 'KELLY_FRACTION', 0.25) if cfg else 0.25
 _OU_THRESH = getattr(cfg, 'OU_VALUE_THRESHOLD', 0.04) if cfg else 0.04
 _DC_THRESH = getattr(cfg, 'DC_VALUE_THRESHOLD', 0.03) if cfg else 0.03
