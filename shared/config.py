@@ -33,7 +33,7 @@ class SharedConfig(BaseSettings):
 
 
 class FootballConfig(SharedConfig):
-    MIN_VALUE_THRESHOLD: float = 0.05
+    MIN_VALUE_THRESHOLD: float = 0.02
     KELLY_FRACTION: float = 0.25
     DC_RHO: float = -0.13
     DC_DECAY: float = 0.0035
