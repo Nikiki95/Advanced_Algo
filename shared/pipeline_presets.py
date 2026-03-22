@@ -7,10 +7,11 @@ PY = sys.executable
 
 PIPELINE_PRESETS = {
     'daily': [
+        # NFL PAUSED until September 2026 (Off-Season)
         [PY, 'football/cron_live.py'],
         [PY, 'football/uefa_live.py'],
         [PY, 'nba/cron_live.py'],
-        [PY, 'nfl/cron_live.py'],
+        # [PY, 'nfl/cron_live.py'],  # PAUSED - Off-Season
         [PY, 'euroleague/cron_live.py'],
         [PY, 'tennis/cron_live.py'],
         [PY, 'shared/settle_team_bets.py', '--sport', 'football'],
@@ -32,7 +33,7 @@ PIPELINE_PRESETS = {
     'props': [
         [PY, 'football/cron_props.py'],
         [PY, 'nba/cron_props.py'],
-        [PY, 'nfl/cron_props.py'],
+        # [PY, 'nfl/cron_props.py'],  # PAUSED - Off-Season
         [PY, 'shared/settle_player_props.py', '--sport', 'all'],
     ],
 }
