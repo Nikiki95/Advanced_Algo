@@ -71,18 +71,18 @@ def combine_seasons():
     return all_games, total_played
 
 def train_model(games):
-    """Train ELO model on SHORT MEMORY (last 20 games)"""
-    print("\n🎓 Training ELO model on SHORT MEMORY (last 20 games)...")
+    """Train ELO model on MEDIUM MEMORY (last 50 games)"""
+    print("\n🎓 Training ELO model on MEDIUM MEMORY (last 50 games)...")
     
-    # Short memory model: Only last 20 games, high K-factor for quick adaptation
+    # Medium memory model: Last 50 games (~2 months), balanced K-factor
     model = NBAEloModel(
         initial_elo=1500,
-        k_factor=40,  # DOUBLED K-factor for faster updates
+        k_factor=32,  # Balanced K-factor
         home_advantage=100,
-        margin_mult=1.2  # Higher margin weight for recent form
+        margin_mult=1.0  # Standard margin weight
     )
     
-    # Sort by date (chronological) and take LAST 20 games only
+    # Sort by date (chronological) and take LAST 50 games
     games_sorted = sorted(games, key=lambda x: x.get('DateUtc', ''))
     games_with_scores = []
     
@@ -94,10 +94,10 @@ def train_model(games):
             if home_score > 0 or away_score > 0:
                 games_with_scores.append(game)
     
-    # SHORT MEMORY: Only last 20 games
-    recent_games = games_with_scores[-20:] if len(games_with_scores) > 20 else games_with_scores
+    # MEDIUM MEMORY: Last 50 games for better data coverage
+    recent_games = games_with_scores[-50:] if len(games_with_scores) > 50 else games_with_scores
     
-    print(f"📊 Using last {len(recent_games)} games (SHORT MEMORY mode)")
+    print(f"📊 Using last {len(recent_games)} games (MEDIUM MEMORY mode)")
     
     trained = 0
     for game in recent_games:
