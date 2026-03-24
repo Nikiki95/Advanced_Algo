@@ -71,33 +71,36 @@ def combine_seasons():
     return all_games, total_played
 
 def train_model(games):
-    """Train ELO model on MEDIUM MEMORY (last 50 games)"""
-    print("\n🎓 Training ELO model on MEDIUM MEMORY (last 50 games)...")
+    """Train ELO model on TIME-BASED MEMORY (last 60 days)"""
+    from datetime import datetime, timedelta
     
-    # Medium memory model: Last 50 games (~2 months), balanced K-factor
+    print("\n🎓 Training ELO model on TIME-BASED MEMORY (last 60 days)...")
+    
+    # Time-based memory: Last 60 days (~400-500 games), balanced K-factor
     model = NBAEloModel(
         initial_elo=1500,
-        k_factor=32,  # Balanced K-factor
+        k_factor=24,  # Lower K for more stable ratings with more data
         home_advantage=100,
-        margin_mult=1.0  # Standard margin weight
+        margin_mult=1.0
     )
     
-    # Sort by date (chronological) and take LAST 50 games
+    # Sort by date
     games_sorted = sorted(games, key=lambda x: x.get('DateUtc', ''))
-    games_with_scores = []
     
-    for game in games_sorted:
+    # Filter: Only games from last 60 days
+    cutoff_date = (datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d')
+    recent_games = [g for g in games_sorted if g.get('DateUtc', '')[:10] >= cutoff_date]
+    
+    # Only games with scores
+    games_with_scores = []
+    for game in recent_games:
         home_score = game.get('HomeTeamScore')
         away_score = game.get('AwayTeamScore')
-        
         if home_score is not None and away_score is not None:
             if home_score > 0 or away_score > 0:
                 games_with_scores.append(game)
     
-    # MEDIUM MEMORY: Last 50 games for better data coverage
-    recent_games = games_with_scores[-50:] if len(games_with_scores) > 50 else games_with_scores
-    
-    print(f"📊 Using last {len(recent_games)} games (MEDIUM MEMORY mode)")
+    print(f"📊 Using {len(games_with_scores)} games from last 60 days")
     
     trained = 0
     for game in recent_games:
