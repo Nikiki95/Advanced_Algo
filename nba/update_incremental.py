@@ -35,20 +35,47 @@ TEAM_ABBREVS = {
 
 def load_existing_model():
     """Lade bestehendes Modell oder erstelle neues"""
-    model_path = Path('models/elo_model_incremental.pkl')
     
-    if model_path.exists():
-        with open(model_path, 'rb') as f:
+    # 1. Prüfe inkrementelles Modell (bevorzugt)
+    incremental_path = Path('models/elo_model_incremental.pkl')
+    if incremental_path.exists():
+        with open(incremental_path, 'rb') as f:
             data = pickle.load(f)
-        print(f"✅ Bestehendes Modell geladen: {sum(len(g) for g in data['games_per_team'].values())} Spiele total")
+        total = sum(len(g) for g in data.get('games_per_team', {}).values())
+        print(f"✅ Inkrementelles Modell geladen: {total} Spiele total")
         return data
-    else:
-        print("🆕 Neues Modell wird erstellt")
-        return {
-            'games_per_team': {},  # Team -> Liste von Spielen
-            'last_update': None,
-            'total_games': 0
-        }
+    
+    # 2. Versuche vom Standard-Modell zu migrieren (falls vorhanden)
+    standard_path = Path('models/elo_model_202603.pkl')
+    if standard_path.exists():
+        try:
+            with open(standard_path, 'rb') as f:
+                std = pickle.load(f)
+            if 'elos' in std and len(std['elos']) > 5:
+                print(f"📥 Migration vom Standard-Modell: {len(std['elos'])} teams gefunden")
+                # Erstelle games_per_team aus ELO-Daten (geschätzt)
+                games_per_team = {}
+                for team, data in std.get('elos', {}).items():
+                    games = data.get('games', 1)
+                    # Wir können die genauen Spiele nicht rekonstruieren, 
+                    # aber wir merken uns, dass wir bereits Daten haben
+                    games_per_team[team] = [{'migrated': True, 'games': games}]
+                return {
+                    'games_per_team': games_per_team,
+                    'last_update': datetime.now().isoformat(),
+                    'total_games': sum(d.get('games', 1) for d in std.get('elos', {}).values()),
+                    'migrated_from_standard': True
+                }
+        except:
+            pass
+    
+    # 3. Neues Modell erstellen
+    print("🆕 Neues Modell wird erstellt")
+    return {
+        'games_per_team': {},
+        'last_update': None,
+        'total_games': 0
+    }
 
 def fetch_yesterday_games():
     """Hole gestrige NBA Spiele"""
@@ -160,7 +187,7 @@ def train_elo_from_history(games_per_team, max_games_per_team=100):
     return model
 
 def save_incremental_model(existing_data, elo_model):
-    """Speichere inkrementelles Modell"""
+    """Speichere inkrementelles Modell - Überschreibe Standard NIE mit weniger Daten!"""
     
     output = {
         'games_per_team': existing_data['games_per_team'],
@@ -170,17 +197,49 @@ def save_incremental_model(existing_data, elo_model):
         'history': elo_model.history if hasattr(elo_model, 'history') else []
     }
     
-    # Speichere inkrementelles Modell
+    # SPEICHERE INKREMENTELLES MODELL (Master)
     with open('models/elo_model_incremental.pkl', 'wb') as f:
         pickle.dump(output, f)
     
-    # Speichere auch als Standard-Modell für Cron
-    with open('models/elo_model_202603.pkl', 'wb') as f:
-        pickle.dump({'elos': output['elos'], 'history': output['history']}, f)
+    # PRÜFE OB WIR DAS STANDARD-MODELL ÜBERSCHREIBEN SOLLTEN
+    standard_path = Path('models/elo_model_202603.pkl')
+    should_update_standard = True
     
-    print(f"\n💾 Modell gespeichert:")
-    print(f"   - Inkrementell: models/elo_model_incremental.pkl")
-    print(f"   - Standard: models/elo_model_202603.pkl")
+    if standard_path.exists() and not standard_path.is_symlink():
+        try:
+            with open(standard_path, 'rb') as f:
+                std = pickle.load(f)
+            std_games = sum(d.get('games', 0) for d in std.get('elos', {}).values())
+            new_games = sum(d.get('games', 0) for d in output['elos'].values())
+            
+            if new_games < std_games * 0.8:  # Wenn < 80% der Daten
+                print(f"\n⚠️  WARNUNG: Inkrementelles Modell hat nur {new_games} Spiele")
+                print(f"    Standard-Modell hat {std_games} Spiele")
+                print(f"    Standard-Modell wird NICHT überschrieben!")
+                should_update_standard = False
+        except:
+            pass
+    
+    # NUR WENN GENUG DATEN: Standard-Modell aktualisieren
+    if should_update_standard:
+        # Backup des alten Standard-Modells
+        if standard_path.exists():
+            backup_path = Path('models/elo_model_backup.pkl')
+            try:
+                with open(standard_path, 'rb') as f:
+                    old = pickle.load(f)
+                with open(backup_path, 'wb') as f:
+                    pickle.dump(old, f)
+            except:
+                pass
+        
+        # Schreibe neues Standard-Modell
+        with open(standard_path, 'wb') as f:
+            pickle.dump({'elos': output['elos'], 'history': output['history']}, f)
+        print(f"   ✅ Standard-Modell aktualisiert")
+    
+    print(f"\n💾 Gespeichert:")
+    print(f"   - Inkrementell (Master): models/elo_model_incremental.pkl")
     print(f"   - Total Spiele: {existing_data['total_games']}")
 
 def main():
